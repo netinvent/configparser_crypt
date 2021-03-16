@@ -13,7 +13,7 @@ __author__ = 'Orsiris de Jong'
 __copyright__ = 'Copyright (C) 2016-2020 Orsiris de Jong'
 __description__ = 'Drop-in replacement for ConfigParser with encryption support'
 __licence__ = 'BSD 3 Clause'
-__version__ = '0.6.1'
+__version__ = '0.6.2'
 __build__ = '2021031601'
 
 import os
@@ -109,8 +109,16 @@ class ConfigParserCrypt(ConfigParser):
 
         We'll keep unused encoding= attribute to be 100% compatible with non encrypted read() function
         """
-        if isinstance(filenames, (str, bytes, os.PathLike)):
-            filenames = [filenames]
+
+        # ConfigParser for python < 3.6 does not use os.PathLike since it does not exist
+        # Fallback to earlier implementation
+        try:
+            if isinstance(filenames, (str, bytes, os.PathLike)):
+                filenames = [filenames]
+        except AttributeError:
+            if isinstance(filenames, str):
+                filenames = [filenames]
+
         read_ok = []
         for filename in filenames:
             try:
@@ -118,8 +126,13 @@ class ConfigParserCrypt(ConfigParser):
                     self._read_encrypted(file_handle, filename, aes_key)
             except OSError:
                 continue
-            if isinstance(filename, os.PathLike):
-                filename = os.fspath(filename)
+            # Same here, we'll get a AttributeError since os.fspath does not exist in Python 3.5
+            # Original ConfigParser did not have that part of the code, let's fallback to ignoring it
+            try:
+                if isinstance(filename, os.PathLike):
+                    filename = os.fspath(filename)
+            except AttributeError:
+                pass
             read_ok.append(filename)
         return read_ok
 
