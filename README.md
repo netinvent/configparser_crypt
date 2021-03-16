@@ -3,6 +3,10 @@
 
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 [![Percentage of issues still open](http://isitmaintained.com/badge/open/netinvent/ofunctions.svg)](http://isitmaintained.com/project/netinvent/configparser_crypt "Percentage of issues still open")
+[![Maintainability](https://api.codeclimate.com/v1/badges/683f2fd6af8fc1c8de73/maintainability)](https://codeclimate.com/github/netinvent/configparser_crypt/maintainability)
+[![linux-tests](https://github.com/netinvent/configparser_crypt/actions/workflows/linux.yaml/badge.svg)](https://github.com/netinvent/configparser_crypt/actions/workflows/linux.yaml)
+[![windows-tests](https://github.com/netinvent/configparser_crypt/actions/workflows/windows.yaml/badge.svg)](https://github.com/netinvent/configparser_crypt/actions/workflows/windows.yaml)
+[![GitHub Release](https://img.shields.io/github/release/netinvent/configparser_crypt.svg?label=Latest)](https://github.com/netinvent/configparser_crypt/releases/latest)
 
 ## Setup
 
