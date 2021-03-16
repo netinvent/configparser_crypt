@@ -61,7 +61,7 @@ class ConfigParserCrypt(ConfigParser):
             raise ValueError('AES Key should be 16 or 32 bytes, %s bytes given.' % len(aes_key))
         self._aes_key = aes_key
 
-    def generate_key(self, size: int = 32):
+    def generate_key(self, size=32):
         """
         Generate a fresh AES 256 bits key by default (32 bytes)
         """
