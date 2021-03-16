@@ -82,7 +82,7 @@ setuptools.setup(
     keywords=['cryptography', 'configparser', 'symmetric', 'cipher', 'encryption', 'config file'],
     long_description=long_description,
     long_description_content_type='text/markdown',
-    pyton_requires='>=2.7',
+    pyton_requires='>=3.5',
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",

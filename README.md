@@ -9,6 +9,10 @@
 [![windows-tests](https://github.com/netinvent/configparser_crypt/actions/workflows/windows.yaml/badge.svg)](https://github.com/netinvent/configparser_crypt/actions/workflows/windows.yaml)
 [![GitHub Release](https://img.shields.io/github/release/netinvent/configparser_crypt.svg?label=Latest)](https://github.com/netinvent/configparser_crypt/releases/latest)
 
+configparser_crypt is a drop-in replacement for configparser, that allows to read / write encrypted configuration files.
+
+It is compatible with Python 3.5+ and is tested on both Linux and Windows.
+
 ## Setup
 
 ```
