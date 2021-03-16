@@ -13,8 +13,8 @@ __author__ = 'Orsiris de Jong'
 __copyright__ = 'Copyright (C) 2016-2020 Orsiris de Jong'
 __description__ = 'Drop-in replacement for ConfigParser with encryption support'
 __licence__ = 'BSD 3 Clause'
-__version__ = '0.6.0'
-__build__ = '2021021701'
+__version__ = '0.6.1'
+__build__ = '2021031601'
 
 import os
 from configparser import ConfigParser
@@ -115,30 +115,33 @@ class ConfigParserCrypt(ConfigParser):
         for filename in filenames:
             try:
                 with open(filename, 'rb') as file_handle:
-                    try:
-
-                        if aes_key is not None:
-                            _, raw_data = symmetric_encryption.decrypt_message(file_handle.read(), aes_key)
-                        elif self.aes_key is not None:
-                            _, raw_data = symmetric_encryption.decrypt_message(file_handle.read(), self.aes_key)
-                        else:
-                            raise ValueError('No aes key provided.')
-                        aes_key = None
-                        # Remove extra bytes, decode bytes to string, split into list as if lines were read from file
-                        # Don't remove footer when footer len = 0 since the [:footer_len] will result in 0 len
-                        if self.footer_length > 0:
-                            data = (raw_data[self.header_length:][:-self.footer_length]).decode('utf-8').split('\n')
-                        else:
-                            data = (raw_data[self.header_length:]).decode('utf-8').split('\n')
-                    except Exception as exc:
-                        raise ValueError('Cannot read AES data: %s' % exc)
-                    self._read(data, filename)
+                    self._read_encrypted(file_handle, filename, aes_key)
             except OSError:
                 continue
             if isinstance(filename, os.PathLike):
                 filename = os.fspath(filename)
             read_ok.append(filename)
         return read_ok
+
+    def _read_encrypted(self, file_handle, filename, aes_key):
+        try:
+
+            if aes_key is not None:
+                _, raw_data = symmetric_encryption.decrypt_message(file_handle.read(), aes_key)
+            elif self.aes_key is not None:
+                _, raw_data = symmetric_encryption.decrypt_message(file_handle.read(), self.aes_key)
+            else:
+                raise ValueError('No aes key provided.')
+            aes_key = None
+            # Remove extra bytes, decode bytes to string, split into list as if lines were read from file
+            # Don't remove footer when footer len = 0 since the [:footer_len] will result in 0 len
+            if self.footer_length > 0:
+                data = (raw_data[self.header_length:][:-self.footer_length]).decode('utf-8').split('\n')
+            else:
+                data = (raw_data[self.header_length:]).decode('utf-8').split('\n')
+        except Exception as exc:
+            raise ValueError('Cannot read AES data: %s' % exc)
+        self._read(data, filename)
 
     def write_encrypted(self, file_handle, space_around_delimiters=True, aes_key=None):
         """Write an .ini-format representation of the configuration state.
