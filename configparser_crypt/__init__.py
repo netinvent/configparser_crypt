@@ -8,13 +8,13 @@ The configparser_crypt package is a dropin replacement for configparser
 that allows read/write of symmetric encrypted ini files
 """
 
-__intname__ = 'configparser_crypt'
-__author__ = 'Orsiris de Jong'
-__copyright__ = 'Copyright (C) 2016-2020 Orsiris de Jong'
-__description__ = 'Drop-in replacement for ConfigParser with encryption support'
-__licence__ = 'BSD 3 Clause'
-__version__ = '0.6.2'
-__build__ = '2021031601'
+__intname__ = "configparser_crypt"
+__author__ = "Orsiris de Jong"
+__copyright__ = "Copyright (C) 2016-2020 Orsiris de Jong"
+__description__ = "Drop-in replacement for ConfigParser with encryption support"
+__licence__ = "BSD 3 Clause"
+__version__ = "0.6.3-dev"
+__build__ = "2021052401"
 
 import os
 from configparser import ConfigParser
@@ -42,14 +42,14 @@ class ConfigParserCrypt(ConfigParser):
 
         # By default, configparser sets all strings to lowercase, this option let's keep the case
         self.optionxform = str
-        self.to_write_data = ''
+        self.to_write_data = ""
 
         # AES cypto key with optional added random bytes
         self._aes_key = None
         self._header_length = 0
         self._footer_length = 0
-        self.random_header = get_random_bytes(self._header_length)
-        self.random_footer = get_random_bytes(self._footer_length)
+        self.random_header = b""
+        self.random_footer = b""
 
     @property
     def aes_key(self):
@@ -58,7 +58,9 @@ class ConfigParserCrypt(ConfigParser):
     @aes_key.setter
     def aes_key(self, aes_key):
         if len(aes_key) not in [16, 32]:
-            raise ValueError('AES Key should be 16 or 32 bytes, %s bytes given.' % len(aes_key))
+            raise ValueError(
+                "AES Key should be 16 or 32 bytes, %s bytes given." % len(aes_key)
+            )
         self._aes_key = aes_key
 
     def generate_key(self, size=32):
@@ -69,7 +71,7 @@ class ConfigParserCrypt(ConfigParser):
             self.aes_key = symmetric_encryption.generate_key(size=size)
             return self.aes_key
         except Exception as exc:
-            raise ValueError('Cannot generate AES key: %s' % exc)
+            raise ValueError("Cannot generate AES key: %s" % exc)
 
     @property
     def header_length(self):
@@ -81,7 +83,7 @@ class ConfigParserCrypt(ConfigParser):
             self.random_header = get_random_bytes(value)
             self._header_length = value
         else:
-            raise ValueError('Header length must be an int')
+            raise ValueError("Header length must be an int")
 
     @property
     def footer_length(self):
@@ -93,7 +95,7 @@ class ConfigParserCrypt(ConfigParser):
             self.random_footer = get_random_bytes(value)
             self._footer_length = value
         else:
-            raise ValueError('Header length must be an int')
+            raise ValueError("Header length must be an int")
 
     def read_encrypted(self, filenames, encoding=None, aes_key=None):
         """Read and parse a filename or an iterable of filenames.
@@ -122,7 +124,7 @@ class ConfigParserCrypt(ConfigParser):
         read_ok = []
         for filename in filenames:
             try:
-                with open(filename, 'rb') as file_handle:
+                with open(filename, "rb") as file_handle:
                     self._read_encrypted(file_handle, filename, aes_key)
             except OSError:
                 continue
@@ -140,20 +142,28 @@ class ConfigParserCrypt(ConfigParser):
         try:
 
             if aes_key is not None:
-                _, raw_data = symmetric_encryption.decrypt_message(file_handle.read(), aes_key)
+                _, raw_data = symmetric_encryption.decrypt_message(
+                    file_handle.read(), aes_key
+                )
             elif self.aes_key is not None:
-                _, raw_data = symmetric_encryption.decrypt_message(file_handle.read(), self.aes_key)
+                _, raw_data = symmetric_encryption.decrypt_message(
+                    file_handle.read(), self.aes_key
+                )
             else:
-                raise ValueError('No aes key provided.')
+                raise ValueError("No aes key provided.")
             aes_key = None
             # Remove extra bytes, decode bytes to string, split into list as if lines were read from file
             # Don't remove footer when footer len = 0 since the [:footer_len] will result in 0 len
             if self.footer_length > 0:
-                data = (raw_data[self.header_length:][:-self.footer_length]).decode('utf-8').split('\n')
+                data = (
+                    (raw_data[self.header_length :][: -self.footer_length])
+                    .decode("utf-8")
+                    .split("\n")
+                )
             else:
-                data = (raw_data[self.header_length:]).decode('utf-8').split('\n')
+                data = (raw_data[self.header_length :]).decode("utf-8").split("\n")
         except Exception as exc:
-            raise ValueError('Cannot read AES data: %s' % exc)
+            raise ValueError("Cannot read AES data: %s" % exc)
         self._read(data, filename)
 
     def write_encrypted(self, file_handle, space_around_delimiters=True, aes_key=None):
@@ -163,16 +173,20 @@ class ConfigParserCrypt(ConfigParser):
         between keys and values are surrounded by spaces.
         """
 
-        self.to_write_data = ''
+        self.to_write_data = ""
 
         if space_around_delimiters:
             delim = " {} ".format(self._delimiters[0])
         else:
             delim = self._delimiters[0]
         if self._defaults:
-            self._write_section_encrypted(self.default_section, self._defaults.items(), delim)
+            self._write_section_encrypted(
+                self.default_section, self._defaults.items(), delim
+            )
         for section in self._sections:
-            self._write_section_encrypted(section, self._sections[section].items(), delim)
+            self._write_section_encrypted(
+                section, self._sections[section].items(), delim
+            )
 
         self.commit_write(file_handle, aes_key=aes_key)
 
@@ -180,10 +194,9 @@ class ConfigParserCrypt(ConfigParser):
         """Write a single section to the specified `fp'."""
         self.to_write_data += "[{}]\n".format(section_name)
         for key, value in section_items:
-            value = self._interpolation.before_write(self, section_name, key,
-                                                     value)
+            value = self._interpolation.before_write(self, section_name, key, value)
             if value is not None or not self._allow_no_value:
-                value = delimiter + str(value).replace('\n', '\n\t')
+                value = delimiter + str(value).replace("\n", "\n\t")
             else:
                 value = ""
             self.to_write_data += "{}{}\n".format(key, value)
@@ -191,14 +204,18 @@ class ConfigParserCrypt(ConfigParser):
 
     def commit_write(self, file_handle, aes_key=None):
         try:
-            data = self.random_header + self.to_write_data.encode('utf-8') + self.random_footer
+            data = (
+                self.random_header
+                + self.to_write_data.encode("utf-8")
+                + self.random_footer
+            )
             if aes_key is not None:
                 enc = symmetric_encryption.encrypt_message(data, aes_key)
             elif self.aes_key is not None:
                 enc = symmetric_encryption.encrypt_message(data, self.aes_key)
             else:
-                raise ValueError('No AES key provided.')
+                raise ValueError("No AES key provided.")
             aes_key = None
             file_handle.write(enc)
         except Exception as exc:
-            raise ValueError('Cannot write AES data: %s' % exc)
+            raise ValueError("Cannot write AES data: %s" % exc)
