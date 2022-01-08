@@ -25,7 +25,44 @@ pip install configparser_crypt
 Just like configparser, except that we read/write binary files and have a AES key.
 
 
-configparser example
+How to write en encrypted config file
+```
+from confiparser_crypt import ConfigParserCrypt
+
+file = 'config.encrypted'
+conf_file = ConfigParsercrypt()
+
+# Create new AES key
+conf_file.generate_key()
+# Don't forget to backup your key somewhere
+aes_key = conf_file.aes_key
+
+# Use like normal configparser class
+conf_file.add_section('TEST')
+conf_file['TEST']['foo'] = 'bar'
+
+# Write encrypted config file
+with open(file, 'wb') as file_handle:
+    conf_file.write_encrypted(file_handle)
+```
+
+How to read an encrypted confi fike
+```
+from confiparser_crypt import ConfigParserCrypt
+
+file = 'config.encrypted'
+conf_file = ConfigParsercrypt()
+
+# Set AES key
+conf_file.aes_key = my_previously_backed_up_aes_key
+
+# Read encrypted config file
+conf_file.read_encrypted(file)
+print(conf_file['TEST']['foo'])
+```
+
+The following is an example of drop-in-replacement for ConfigParser
+
 ```diff
 -from configparser import ConfigParser
 +from configparser_crypt import ConfigParserCrypt
@@ -33,6 +70,7 @@ configparser example
 file = 'config.ini'
 -conf_file = ConfigParser()
 +conf_file = ConfigParserCrypt()
++key = conf_file.generate_key()
 
 # Add some values to the file
 conf_file.add_section('TEST')
