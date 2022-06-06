@@ -19,7 +19,7 @@ __build__ = "2022060601"
 import configparser_crypt
 
 
-def configparser_to_dict(config: configparser_crypt.ConfigParser) -> dict:
+def configparser_to_dict(config: configparser_crypt.ConfigParserCrypt) -> dict:
     config_dict = {}
     for section in config.sections():
         config_dict[section] = {}
@@ -47,7 +47,7 @@ def configparser_to_dict(config: configparser_crypt.ConfigParser) -> dict:
 
 
 def dict_to_configparser(config_dict: dict) -> configparser_crypt.ConfigParser:
-    config = configparser_crypt.ConfigParser()
+    config = configparser_crypt.ConfigParserCrypt()
 
     for section in config_dict.keys():
         config.add_section(section)
