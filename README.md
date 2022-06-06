@@ -11,7 +11,7 @@
 
 configparser_crypt is a drop-in replacement for configparser, that allows to read / write encrypted configuration files.
 
-It is compatible with Python 3.5+ and is tested on both Linux and Windows.
+It is compatible with Python 3.5+/PyPy and is tested on both Linux and Windows.
 
 ## Setup
 
@@ -23,6 +23,8 @@ pip install configparser_crypt
 ## Usage
 
 Just like configparser, except that we read/write binary files and have a AES key.
+AES key generation is done using `generat_key()` which by default generates a 256-bit encryption key.
+You may also generate a 128 or 192 bit key by giving the byte length as parameter (16, 24 or 32 bytes).
 
 
 How to write en encrypted config file
@@ -91,4 +93,39 @@ conf_file['TEST']['spam'] = 'eggs'
 
 # Check that config file contains 'spam = eggs'
 assert conf_file['TEST']['spam'] == 'eggs'
+```
+
+Just like ConfigParser, ConfigParserCrypt provides a ConfigParser object.
+It's sometimes useful to switch between those objects and a dictionary.
+
+ConfigParserCrypt has configparser to dict and dict to configparser object functions included.
+Since ConfigParser stores all variables (int, float, bool) as strings, the converter functions try to recast the original type of the variable when rendering a dictionary.
+
+The only drawback is that your dictionaries must not exceed more than two level depth, eg:
+```python
+my_dict = {
+    'section_name':
+        {
+            'some_name': 'some_var'
+        },
+    'another_section':
+        {
+            'another_var': 'something',
+            'an int': 1,
+            'a bool': False
+        }
+}
+```
+
+Note that these convert functions also work with vanilla ConfigPaser
+Example:
+```python
+
+import ConfigParserCrypt
+from configparser_crypt.dict_convert import configparser_to_dict, dict_to_configparser
+
+my_dict = configparser_to_dict(configparser_object)
+type(my_dict['some_int']) == True
+
+my_config_parser_object = dict_to_configparser(some_dict)
 ```
