@@ -10,11 +10,11 @@ that allows read/write of symmetric encrypted ini files
 
 __intname__ = "configparser_crypt"
 __author__ = "Orsiris de Jong"
-__copyright__ = "Copyright (C) 2016-2020 Orsiris de Jong"
+__copyright__ = "Copyright (C) 2016-2022 Orsiris de Jong"
 __description__ = "Drop-in replacement for ConfigParser with encryption support"
 __licence__ = "BSD 3 Clause"
-__version__ = "0.6.3-dev"
-__build__ = "2021052401"
+__version__ = "1.0.0"
+__build__ = "2022060601"
 
 import os
 from configparser import ConfigParser
