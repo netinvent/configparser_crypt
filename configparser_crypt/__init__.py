@@ -4,7 +4,7 @@
 # This file is part of configparser_crypt package
 
 """
-The configparser_crypt package is a dropin replacement for configparser
+The configparser_crypt package is a drop-in replacement for configparser
 that allows read/write of symmetric encrypted ini files
 """
 
@@ -14,7 +14,7 @@ __copyright__ = "Copyright (C) 2016-2022 Orsiris de Jong"
 __description__ = "Drop-in replacement for ConfigParser with encryption support"
 __licence__ = "BSD 3 Clause"
 __version__ = "1.0.0"
-__build__ = "2022060601"
+__build__ = "2022102801"
 
 import os
 from configparser import ConfigParser
@@ -48,8 +48,6 @@ class ConfigParserCrypt(ConfigParser):
         self._aes_key = None
         self._header_length = 0
         self._footer_length = 0
-        self.random_header = b""
-        self.random_footer = b""
 
     @property
     def aes_key(self):
@@ -80,7 +78,6 @@ class ConfigParserCrypt(ConfigParser):
     @header_length.setter
     def header_length(self, value):
         if isinstance(value, int):
-            self.random_header = get_random_bytes(value)
             self._header_length = value
         else:
             raise ValueError("Header length must be an int")
@@ -92,7 +89,6 @@ class ConfigParserCrypt(ConfigParser):
     @footer_length.setter
     def footer_length(self, value):
         if isinstance(value, int):
-            self.random_footer = get_random_bytes(value)
             self._footer_length = value
         else:
             raise ValueError("Header length must be an int")
@@ -142,26 +138,18 @@ class ConfigParserCrypt(ConfigParser):
         try:
 
             if aes_key is not None:
-                _, raw_data = symmetric_encryption.decrypt_message(
-                    file_handle.read(), aes_key
+                _, raw_data = symmetric_encryption.decrypt_message_hf(
+                    file_handle.read(), aes_key, random_header_len=self._header_length, random_footer_len=self._footer_length
                 )
             elif self.aes_key is not None:
-                _, raw_data = symmetric_encryption.decrypt_message(
-                    file_handle.read(), self.aes_key
+                _, raw_data = symmetric_encryption.decrypt_message_hf(
+                    file_handle.read(), self.aes_key, random_header_len=self._header_length, random_footer_len=self._footer_length
                 )
             else:
                 raise ValueError("No aes key provided.")
+            # Don't keep optional aes_key in memory if not needed
             aes_key = None
-            # Remove extra bytes, decode bytes to string, split into list as if lines were read from file
-            # Don't remove footer when footer len = 0 since the [:footer_len] will result in 0 len
-            if self.footer_length > 0:
-                data = (
-                    (raw_data[self.header_length :][: -self.footer_length])
-                    .decode("utf-8")
-                    .split("\n")
-                )
-            else:
-                data = (raw_data[self.header_length :]).decode("utf-8").split("\n")
+            data = data.decode("utf-8").split("\n")
         except Exception as exc:
             raise ValueError("Cannot read AES data: %s" % exc)
         self._read(data, filename)
@@ -204,15 +192,11 @@ class ConfigParserCrypt(ConfigParser):
 
     def commit_write(self, file_handle, aes_key=None):
         try:
-            data = (
-                self.random_header
-                + self.to_write_data.encode("utf-8")
-                + self.random_footer
-            )
+            data = self.to_write_data.encode("utf-8")
             if aes_key is not None:
-                enc = symmetric_encryption.encrypt_message(data, aes_key)
+                enc = symmetric_encryption.encrypt_message_hf(data, aes_key, random_header_len=self._header_length, random_footer_len=self._footer_length)
             elif self.aes_key is not None:
-                enc = symmetric_encryption.encrypt_message(data, self.aes_key)
+                enc = symmetric_encryption.encrypt_message_hf(data, self.aes_key, random_header_len=self._header_length, random_footer_len=self._footer_length)
             else:
                 raise ValueError("No AES key provided.")
             aes_key = None
