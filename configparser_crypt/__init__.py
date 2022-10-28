@@ -149,7 +149,7 @@ class ConfigParserCrypt(ConfigParser):
                 raise ValueError("No aes key provided.")
             # Don't keep optional aes_key in memory if not needed
             aes_key = None
-            data = data.decode("utf-8").split("\n")
+            data = raw_data.decode("utf-8").split("\n")
         except Exception as exc:
             raise ValueError("Cannot read AES data: %s" % exc)
         self._read(data, filename)
