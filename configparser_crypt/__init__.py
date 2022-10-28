@@ -136,23 +136,17 @@ class ConfigParserCrypt(ConfigParser):
 
     def _read_encrypted(self, file_handle, filename, aes_key):
         try:
-
-            if aes_key is not None:
-                _, raw_data = symmetric_encryption.decrypt_message_hf(
-                    file_handle.read(),
-                    aes_key,
-                    random_header_len=self._header_length,
-                    random_footer_len=self._footer_length,
-                )
-            elif self.aes_key is not None:
-                _, raw_data = symmetric_encryption.decrypt_message_hf(
-                    file_handle.read(),
-                    self.aes_key,
-                    random_header_len=self._header_length,
-                    random_footer_len=self._footer_length,
-                )
-            else:
+            if aes_key is None and self.aes_key is None:
                 raise ValueError("No aes key provided.")
+            if aes_key is None:
+                # on the fly provided aes key has precedence over class aes key
+                aes_key = self.aes_key
+            _, raw_data = symmetric_encryption.decrypt_message_hf(
+                file_handle.read(),
+                aes_key,
+                random_header_len=self._header_length,
+                random_footer_len=self._footer_length,
+            )
             # Don't keep optional aes_key in memory if not needed
             aes_key = None
             data = raw_data.decode("utf-8").split("\n")
@@ -199,22 +193,17 @@ class ConfigParserCrypt(ConfigParser):
     def commit_write(self, file_handle, aes_key=None):
         try:
             data = self.to_write_data.encode("utf-8")
-            if aes_key is not None:
-                enc = symmetric_encryption.encrypt_message_hf(
-                    data,
-                    aes_key,
-                    random_header_len=self._header_length,
-                    random_footer_len=self._footer_length,
-                )
-            elif self.aes_key is not None:
-                enc = symmetric_encryption.encrypt_message_hf(
-                    data,
-                    self.aes_key,
-                    random_header_len=self._header_length,
-                    random_footer_len=self._footer_length,
-                )
-            else:
-                raise ValueError("No AES key provided.")
+            if aes_key is None and self.aes_key is None:
+                raise ValueError("No aes key provided.")
+            if aes_key is None:
+                # on the fly provided aes key has precedence over class aes key
+                aes_key = self.aes_key
+            enc = symmetric_encryption.encrypt_message_hf(
+                data,
+                aes_key,
+                random_header_len=self._header_length,
+                random_footer_len=self._footer_length,
+            )               
             aes_key = None
             file_handle.write(enc)
         except Exception as exc:
