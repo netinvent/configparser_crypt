@@ -139,11 +139,17 @@ class ConfigParserCrypt(ConfigParser):
 
             if aes_key is not None:
                 _, raw_data = symmetric_encryption.decrypt_message_hf(
-                    file_handle.read(), aes_key, random_header_len=self._header_length, random_footer_len=self._footer_length
+                    file_handle.read(),
+                    aes_key,
+                    random_header_len=self._header_length,
+                    random_footer_len=self._footer_length,
                 )
             elif self.aes_key is not None:
                 _, raw_data = symmetric_encryption.decrypt_message_hf(
-                    file_handle.read(), self.aes_key, random_header_len=self._header_length, random_footer_len=self._footer_length
+                    file_handle.read(),
+                    self.aes_key,
+                    random_header_len=self._header_length,
+                    random_footer_len=self._footer_length,
                 )
             else:
                 raise ValueError("No aes key provided.")
@@ -194,9 +200,19 @@ class ConfigParserCrypt(ConfigParser):
         try:
             data = self.to_write_data.encode("utf-8")
             if aes_key is not None:
-                enc = symmetric_encryption.encrypt_message_hf(data, aes_key, random_header_len=self._header_length, random_footer_len=self._footer_length)
+                enc = symmetric_encryption.encrypt_message_hf(
+                    data,
+                    aes_key,
+                    random_header_len=self._header_length,
+                    random_footer_len=self._footer_length,
+                )
             elif self.aes_key is not None:
-                enc = symmetric_encryption.encrypt_message_hf(data, self.aes_key, random_header_len=self._header_length, random_footer_len=self._footer_length)
+                enc = symmetric_encryption.encrypt_message_hf(
+                    data,
+                    self.aes_key,
+                    random_header_len=self._header_length,
+                    random_footer_len=self._footer_length,
+                )
             else:
                 raise ValueError("No AES key provided.")
             aes_key = None

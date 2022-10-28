@@ -15,11 +15,11 @@ Versioning semantics:
 
 """
 
-__intname__ = 'tests.configparser_crypt'
-__author__ = 'Orsiris de Jong'
-__copyright__ = 'Copyright (C) 2018-2021 Orsiris de Jong'
-__licence__ = 'BSD 3 Clause'
-__build__ = '2021021701'
+__intname__ = "tests.configparser_crypt"
+__author__ = "Orsiris de Jong"
+__copyright__ = "Copyright (C) 2018-2022 Orsiris de Jong"
+__licence__ = "BSD 3 Clause"
+__build__ = "2021021701"
 
 import os
 from random import random
@@ -30,17 +30,17 @@ from configparser_crypt import ConfigParserCrypt
 def test_readme_example_configparser():
     from configparser import ConfigParser
 
-    file = 'config.ini'
+    file = "config.ini"
     if os.path.exists(file):
         os.remove(file)
     conf_file = ConfigParserCrypt()
 
     # Add some values to the file
-    conf_file.add_section('TEST')
-    conf_file['TEST']['spam'] = 'eggs'
+    conf_file.add_section("TEST")
+    conf_file["TEST"]["spam"] = "eggs"
 
     # Write config file
-    with open(file, 'w') as file_handle:
+    with open(file, "w") as file_handle:
         conf_file.write(file_handle)
 
     # Read from config file
@@ -48,26 +48,27 @@ def test_readme_example_configparser():
     conf_file.read(file)
 
     # Check that config file contains 'spam = eggs'
-    assert conf_file['TEST']['spam'] == 'eggs'
+    assert conf_file["TEST"]["spam"] == "eggs"
 
     if os.path.exists(file):
         os.remove(file)
 
+
 def test_readme_example_configparser_crypt():
     from configparser_crypt import ConfigParserCrypt
 
-    file = 'config.ini'
+    file = "config.ini"
     if os.path.exists(file):
         os.remove(file)
     conf_file = ConfigParserCrypt()
     secure_key = conf_file.generate_key()
 
     # Add some values to the file
-    conf_file.add_section('TEST')
-    conf_file['TEST']['spam'] = 'eggs'
+    conf_file.add_section("TEST")
+    conf_file["TEST"]["spam"] = "eggs"
 
     # Write config file
-    with open(file, 'wb') as file_handle:
+    with open(file, "wb") as file_handle:
         conf_file.write_encrypted(file_handle)
 
     # Read from config file
@@ -76,7 +77,7 @@ def test_readme_example_configparser_crypt():
     conf_file.read_encrypted(file)
 
     # Check that config file contains 'spam = eggs'
-    assert conf_file['TEST']['spam'] == 'eggs'
+    assert conf_file["TEST"]["spam"] == "eggs"
 
     if os.path.exists(file):
         os.remove(file)
@@ -84,32 +85,35 @@ def test_readme_example_configparser_crypt():
 
 def test_ConfigParserCrypt():
     for i in range(0, 20):
-        filename = 'test_{}.file'.format(int(random() * 100000))
+        filename = "test_{}.file".format(int(random() * 100000))
         if os.path.exists(filename):
             os.remove(filename)
 
         conf_file = ConfigParserCrypt()
         conf_file.generate_key()
 
+        # Let's keep default values (zero) for the fist test
         if i != 0:
             conf_file.header_length = int(random() * 2048) * i
             conf_file.footer_length = int(random() * 1000) * i
 
-        conf_file.add_section('TEST')
-        conf_file['TEST']['spam'] = 'eggs'
-        with open(filename, 'wb') as fp:
+        conf_file.add_section("TEST")
+        conf_file["TEST"]["spam"] = "eggs"
+        with open(filename, "wb") as fp:
             conf_file.write_encrypted(fp)
-        conf_file['TEST']['spam'] = 'No'
+        conf_file["TEST"]["spam"] = "No"
         conf_file.read_encrypted(filename)
-        assert conf_file['TEST']['spam'] == 'eggs', 'Write / read of config should present same result'
+        assert (
+            conf_file["TEST"]["spam"] == "eggs"
+        ), "Write / read of config should present same result"
 
-        print('Test conf file size: ', os.stat(filename).st_size)
+        print("Test conf file size: ", os.stat(filename).st_size)
         if os.path.exists(filename):
             os.remove(filename)
 
 
-if __name__ == '__main__':
-    print('Example code for %s, %s' % (__intname__, __build__))
+if __name__ == "__main__":
+    print("Example code for %s, %s" % (__intname__, __build__))
     test_readme_example_configparser()
     test_readme_example_configparser_crypt()
     test_ConfigParserCrypt()
