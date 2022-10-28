@@ -19,7 +19,7 @@ __intname__ = "tests.configparser_crypt"
 __author__ = "Orsiris de Jong"
 __copyright__ = "Copyright (C) 2018-2022 Orsiris de Jong"
 __licence__ = "BSD 3 Clause"
-__build__ = "2021021701"
+__build__ = "2022102801"
 
 import os
 from random import random
@@ -110,6 +110,38 @@ def test_ConfigParserCrypt():
         print("Test conf file size: ", os.stat(filename).st_size)
         if os.path.exists(filename):
             os.remove(filename)
+
+
+def test_special_chars_test():
+    """
+    Make sure input and output are identical
+    By default, ConfigParser needs %% to represent '%' char
+    using interpolation=None disables specific handling of '%' char
+    """
+    special_string = r'+oy%#"Xd2EYKc9Gb@u'
+
+    filename = "test_{}.file".format(int(random() * 100000))
+    if os.path.exists(filename):
+        os.remove(filename)
+
+    conf_file = ConfigParserCrypt(interpolation=None)
+    conf_file.generate_key()
+
+    conf_file.add_section("TEST")
+    conf_file["TEST"]["special_string"] = special_string
+
+
+    with open(filename, "wb") as fp:
+        conf_file.write_encrypted(fp)
+    conf_file["TEST"]["special_string"] = "No"
+    conf_file.read_encrypted(filename)
+    assert (
+        conf_file["TEST"]["special_string"] == special_string
+    ), "Write / read of config should present same result"
+
+    print("Test conf file size: ", os.stat(filename).st_size)
+    if os.path.exists(filename):
+        os.remove(filename)
 
 
 if __name__ == "__main__":
