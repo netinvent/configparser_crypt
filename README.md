@@ -95,6 +95,17 @@ conf_file['TEST']['spam'] = 'eggs'
 assert conf_file['TEST']['spam'] == 'eggs'
 ```
 
+## Load an encryption key to open an encrypted config file
+
+In order to open earlier written encrypted configuration files, you need to store the aes key generated with `aes_key = conf_file.generate_key()`.
+You can than later use it by loading it into the class:
+```
+file = 'my_encrypted.conf'
+conf_file = ConfigParserCrypt()
+conf_file.aes_key = 'PUT YOUR PREVIOUSLY GENERATED AES KEY HERE'
++conf_file.read_encrypted(file)
+```
+
 ## Convert a plain ini file to encrypted version and vice-versa
 
 It's pretty simple to encrypt an existing .ini file.
