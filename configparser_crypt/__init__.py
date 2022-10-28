@@ -203,7 +203,7 @@ class ConfigParserCrypt(ConfigParser):
                 aes_key,
                 random_header_len=self._header_length,
                 random_footer_len=self._footer_length,
-            )               
+            )
             aes_key = None
             file_handle.write(enc)
         except Exception as exc:
