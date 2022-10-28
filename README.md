@@ -23,7 +23,7 @@ pip install configparser_crypt
 ## Usage
 
 Just like configparser, except that we read/write binary files and have a AES key.
-AES key generation is done using `generat_key()` which by default generates a 256-bit encryption key.
+AES key generation is done using `generate_key()` which by default generates a 256-bit encryption key.
 You may also generate a 128 or 192 bit key by giving the byte length as parameter (16, 24 or 32 bytes).
 
 
@@ -94,6 +94,34 @@ conf_file['TEST']['spam'] = 'eggs'
 # Check that config file contains 'spam = eggs'
 assert conf_file['TEST']['spam'] == 'eggs'
 ```
+
+## Convert a plain ini file to encrypted version and vice-versa
+
+It's pretty simple to encrypt an existing .ini file.
+You just need to read it as standard ini file, then write it as encrypted file.
+
+```
+original_file = 'config.ini'
+target_encrypted_file = 'config.encrypted'
+
+conf_file = ConfigParsercrypt()
+
+# Create new AES key
+conf_file.generate_key()
+# Don't forget to backup your key somewhere for later usage
+aes_key = conf_file.aes_key
+
+# Read original file
+config_file.read(original_file)
+# Write encrypted config file
+with open(target_encrypted_file, 'wb') as file_handle:
+    conf_file.write_encrypted(file_handle)
+```
+
+Just keep in mind that secure deletion of the original file is out of scope of ConfigParserCrypt.
+Of course, you can also read an encrypted file and save it as non encrypted.
+
+## Convert ConfigParser to dictionary and vice-versa
 
 Just like ConfigParser, ConfigParserCrypt provides a ConfigParser object.
 It's sometimes useful to switch between those objects and a dictionary.
