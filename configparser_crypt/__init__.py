@@ -15,6 +15,7 @@ __description__ = "Drop-in replacement for ConfigParser with encryption support"
 __licence__ = "BSD 3 Clause"
 __version__ = "1.0.0"
 __build__ = "2022102801"
+__compat__ = "python3.5+"
 
 import os
 from configparser import ConfigParser
