@@ -28,8 +28,8 @@ You may also generate a 128 or 192 bit key by giving the byte length as paramete
 
 
 How to write en encrypted config file
-```
-from confiparser_crypt import ConfigParserCrypt
+```python
+from configparser_crypt import ConfigParserCrypt
 
 file = 'config.encrypted'
 conf_file = ConfigParsercrypt()
@@ -48,9 +48,9 @@ with open(file, 'wb') as file_handle:
     conf_file.write_encrypted(file_handle)
 ```
 
-How to read an encrypted confi fike
-```
-from confiparser_crypt import ConfigParserCrypt
+How to read an encrypted config file
+```python
+from configparser_crypt import ConfigParserCrypt
 
 file = 'config.encrypted'
 conf_file = ConfigParsercrypt()
@@ -99,7 +99,7 @@ assert conf_file['TEST']['spam'] == 'eggs'
 
 In order to open earlier written encrypted configuration files, you need to store the aes key generated with `aes_key = conf_file.generate_key()`.
 You can than later use it by loading it into the class:
-```
+```python
 file = 'my_encrypted.conf'
 conf_file = ConfigParserCrypt()
 conf_file.aes_key = 'PUT YOUR PREVIOUSLY GENERATED AES KEY HERE'
@@ -111,7 +111,7 @@ conf_file.aes_key = 'PUT YOUR PREVIOUSLY GENERATED AES KEY HERE'
 It's pretty simple to encrypt an existing .ini file.
 You just need to read it as standard ini file, then write it as encrypted file.
 
-```
+```python
 original_file = 'config.ini'
 target_encrypted_file = 'config.encrypted'
 
