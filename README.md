@@ -103,7 +103,7 @@ You can than later use it by loading it into the class:
 file = 'my_encrypted.conf'
 conf_file = ConfigParserCrypt()
 conf_file.aes_key = 'PUT YOUR PREVIOUSLY GENERATED AES KEY HERE'
-+conf_file.read_encrypted(file)
+conf_file.read_encrypted(file)
 ```
 
 ## Convert a plain ini file to encrypted version and vice-versa
