@@ -1,1 +1,1 @@
-cryptidy>=1.1.0
+cryptidy>=1.2.2
