@@ -32,7 +32,7 @@ How to write en encrypted config file
 from configparser_crypt import ConfigParserCrypt
 
 file = 'config.encrypted'
-conf_file = ConfigParsercrypt()
+conf_file = ConfigParserCrypt()
 
 # Create new AES key
 conf_file.generate_key()
@@ -53,7 +53,7 @@ How to read an encrypted config file
 from configparser_crypt import ConfigParserCrypt
 
 file = 'config.encrypted'
-conf_file = ConfigParsercrypt()
+conf_file = ConfigParserCrypt()
 
 # Set AES key
 conf_file.aes_key = my_previously_backed_up_aes_key
@@ -115,7 +115,7 @@ You just need to read it as standard ini file, then write it as encrypted file.
 original_file = 'config.ini'
 target_encrypted_file = 'config.encrypted'
 
-conf_file = ConfigParsercrypt()
+conf_file = ConfigParserCrypt()
 
 # Create new AES key
 conf_file.generate_key()
