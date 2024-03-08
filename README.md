@@ -123,7 +123,7 @@ conf_file.generate_key()
 aes_key = conf_file.aes_key
 
 # Read original file
-config_file.read(original_file)
+conf_file.read(original_file)
 # Write encrypted config file
 with open(target_encrypted_file, 'wb') as file_handle:
     conf_file.write_encrypted(file_handle)
